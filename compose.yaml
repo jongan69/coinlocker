@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -11,6 +9,3 @@ services:
       - KRAKEN_API_SECRET=${KRAKEN_API_SECRET}
       - MONGO_URL=${MONGO_URL}
       - PRIVATE_KEY=${PRIVATE_KEY}
-    volumes:
-      - .:/usr/src/app
-    command: ["./combinedwallettest"]
