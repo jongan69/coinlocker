@@ -1,5 +1,5 @@
 # Stage 1: Use cargo-chef to manage dependency caching
-FROM lukemathwalker/cargo-chef:latest as chef
+FROM lukemathwalker/cargo-chef:latest AS chef
 WORKDIR /app
 
 # Stage 2: Planner - Create the build plan
@@ -12,6 +12,8 @@ RUN cargo chef prepare --recipe-path recipe.json
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
+
+# Only re-copy source files if they change
 COPY . .
 RUN cargo build --release
 RUN mv ./target/release/combinedwallettest ./app

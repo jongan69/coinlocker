@@ -41,6 +41,8 @@ A Rust AXUM API that automates the transaction process from bitcoin to Solana SP
 
 ### Making Scripts Executable
 
+Unfinished:
+
 Use `chmod +x scripts/clean_build.sh scripts/debug.sh` to ensure both scripts are executable:
 
 ```sh
@@ -53,9 +55,17 @@ Run Clean Build
 scripts/clean_build.sh
 ```
 
+### Deploy Docker Image to Cloud:
+
+1. Create droplet / VM with root password
+2. Run `Cargo clean` to slim down copy process
+// scp -r ./ root@167.99.127.45:./  
+3. In project directory `scp -r ./ root@your_droplet_ip:./` to copy project to the root of the VM
+4. Use with: `chmod +x ./scripts/install-docker.sh` and `docker-compose --version`
+5. `docker-compose up --build` in VM/Droplet root directory or where ever project was copied to
 
 # Useful to knows:
-- `docker buildx build .` or `docker compose up` or `scripts/clean_build.sh` use docker to build and run, not operable yet
+- `chmod +x ./scripts/install-docker.sh` to make it executable
 - `cargo build` and `cargo run` run the rust axum api locally
 - Kraken has a minimum 0.0001 BTC trade minimum
-- Private key is needed for anything in `lockin.rs` to work
+- Private key for wallet verified as Kraken Withdrawl address is needed for anything in `lockin.rs` to work

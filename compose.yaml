@@ -9,3 +9,9 @@ services:
       - KRAKEN_API_SECRET=${KRAKEN_API_SECRET}
       - MONGO_URL=${MONGO_URL}
       - PRIVATE_KEY=${PRIVATE_KEY}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+        reservations:
+          cpus: '0.25'
