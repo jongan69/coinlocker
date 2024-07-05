@@ -70,9 +70,15 @@ pub async fn decrypt_keys_handler(
     };
 
     let response = json!({
-        "solana_private_key": solana_private_key,
-        "bitcoin_private_key": bitcoin_private_key,
-        "ethereum_private_key": ethereum_private_key,
+        "solana": {
+            "private_key": solana_private_key,
+        },
+        "bitcoin": {
+            "private_key": bitcoin_private_key,
+        },
+        "ethereum": {
+            "private_key": ethereum_private_key,
+        }
     });
 
     (StatusCode::OK, ResponseJson(response)).into_response()

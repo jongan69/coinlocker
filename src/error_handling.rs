@@ -29,9 +29,6 @@ pub enum AppError {
     #[error("Electrum client error")]
     ElectrumClientError(#[from] bdk::electrum_client::Error),
 
-    #[error("Address conversion error")]
-    AddressConversionError,
-
     #[error("Kraken API error")]
     KrakenError(#[from] KrakenError),
 
@@ -55,7 +52,6 @@ impl IntoResponse for AppError {
             AppError::DecryptionError => (StatusCode::BAD_REQUEST, self.to_string()),
             AppError::BitcoinConsensusError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
             AppError::ElectrumClientError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
-            AppError::AddressConversionError => (StatusCode::BAD_REQUEST, self.to_string()),
             AppError::KrakenError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
             AppError::ReqwestError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
             AppError::SerdeJsonError(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
@@ -70,5 +66,20 @@ impl From<ParseFloatError> for AppError {
     fn from(parse_error: ParseFloatError) -> Self {
         let error_message = format!("Error converting string to float: {}", parse_error);
         AppError::CustomError(error_message)
+    }
+}
+
+impl From<anyhow::Error> for AppError {
+    fn from(error: anyhow::Error) -> Self {
+        let _ = error;
+        // Convert the `anyhow::Error` into an `AppError`
+        // based on the specific error handling logic you want.
+        // You can handle different error types here and map them to `AppError`.
+        // For example:
+        // match error.downcast_ref::<ParseFloatError>() {
+        //     Some(parse_float_error) => AppError::from(parse_float_error),
+        //     None => AppError::OtherError("Unknown error".to_string()),
+        // }
+        AppError::CustomError("An error occurred".to_string())
     }
 }

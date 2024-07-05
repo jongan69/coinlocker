@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 // get_address_from_txid.rs
 use bdk::bitcoin::{Txid, Network};
 use bdk::bitcoin::util::address::Address;
@@ -10,7 +11,8 @@ use std::str::FromStr;
 
 use crate::error_handling::AppError;
 
-pub async fn get_sender_addresses(txid_str: &str, electrum_url: &str) -> Result<Vec<Address>, AppError> {
+// Function for getting the senders address using the 
+pub fn get_sender_addresses(txid_str: &str, electrum_url: &str) -> Result<Vec<Address>, AppError> {
     let txid = Txid::from_str(txid_str).map_err(|_| AppError::BitcoinConsensusError(bdk::bitcoin::consensus::encode::Error::ParseFailed("Failed to parse Txid".into())))?;
     let client = ElectrumClient::new(electrum_url)?;
 
@@ -34,7 +36,7 @@ pub async fn get_sender_addresses(txid_str: &str, electrum_url: &str) -> Result<
             Err(_) => {
                 // Log the error or handle it accordingly
                 eprintln!("Invalid script_pubkey for address conversion: {:?}", script_pubkey);
-                return Err(AppError::AddressConversionError);
+                // return Err(AppError::AddressConversionError);
             },
         }
     }

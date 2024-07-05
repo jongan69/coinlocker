@@ -61,11 +61,11 @@ scripts/clean_build.sh
 2. Run `Cargo clean` to slim down copy process
 // scp -r ./ root@167.99.127.45:./  
 3. In project directory `scp -r ./ root@your_droplet_ip:./` to copy project to the root of the VM
-4. Use with: `chmod +x ./scripts/install-docker.sh` and `docker-compose --version`
+4. Use with: `chmod +x ./scripts/install-docker.sh` then `./scripts/install-docker.sh` and check with `docker-compose --version`
 5. `docker-compose up --build` in VM/Droplet root directory or where ever project was copied to
 
 # Useful to knows:
 - `chmod +x ./scripts/install-docker.sh` to make it executable
-- `cargo build` and `cargo run` run the rust axum api locally
+- `cargo build` builds and `cargo run` runs the rust axum api locally
 - Kraken has a minimum 0.0001 BTC trade minimum
 - Private key for wallet verified as Kraken Withdrawl address is needed for anything in `lockin.rs` to work

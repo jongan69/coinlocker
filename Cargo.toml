@@ -1,5 +1,5 @@
 [package]
-name = "combinedwallettest"
+name = "coinlockerapi"
 version = "0.1.0"
 edition = "2021"
 
@@ -32,3 +32,9 @@ jupiter-swap-api-client = "0.1.0"
 base64 = "0.22.1"
 bs58 = "0.5.1"
 bincode = "1.3.3"
+log = "0.4.22"
+env_logger = "0.11.3"
+solana-client = "1.18.0"
+solana-program = "1.18.0"
+spl-associated-token-account = "1.1.0"
+spl-token = "3.4.0"

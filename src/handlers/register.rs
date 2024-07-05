@@ -49,7 +49,10 @@ pub async fn register(Json(payload): Json<RegisterRequest>) -> impl IntoResponse
         Ok(None) => {
             return (StatusCode::NOT_FOUND, Json("User not found".to_string())).into_response();
         }
-        Err(_) => return AppError::InternalServerError.into_response(),
+        Err(err) => {
+            print!("Something else happened With User {}: {}", payload.user_id, err);  
+            return AppError::InternalServerError.into_response();
+        }
     };
 
     if user_has_wallets(&user) {
@@ -108,6 +111,8 @@ async fn generate_and_save_wallets(user: &mut User) -> Result<(SolWalletResponse
     user.bitcoin_mnemonic = Some(encrypt(&bitcoin_wallet.mnemonic, key, nonce)?);
     user.bitcoin_public_key = Some(bitcoin_wallet.public_key.clone());
     user.bitcoin_private_key = Some(encrypt(&bitcoin_wallet.private_key, key, nonce)?);
+
+
 
     let (secret_key, pub_key, pub_address) = generate_keypair();
     user.ethereum_public_key = Some(pub_key.to_string());

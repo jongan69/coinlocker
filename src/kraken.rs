@@ -1,10 +1,14 @@
-use serde::{Serialize, Deserialize};
-use serde_json::{json, Value};
-use dotenv::dotenv;
-use std::{collections::HashMap, time::{SystemTime, UNIX_EPOCH}};
-use kraken_rest_client::{Client, Error, OrderSide}; // Replace with the actual crate name
+// kraken.rs
 use crate::error_handling::AppError; // Import the custom error type
-use reqwest::Client as SimpleClient; // Use reqwest client
+use dotenv::dotenv;
+use kraken_rest_client::{Client, Error, OrderSide}; // Replace with the actual crate name
+use reqwest::Client as SimpleClient;
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+use std::{
+    collections::HashMap,
+    time::{SystemTime, UNIX_EPOCH},
+}; // Use reqwest client
 
 // Structs
 #[derive(Debug, Deserialize, Serialize)]
@@ -137,17 +141,19 @@ pub async fn execute_swap(pair: &str, side: OrderSide, volume: f64) -> Result<Va
     println!("Payload: {}", payload); // Debug print
 
     // Send the order request
-    let response: Result<Value, Error> = client.send_private_json("/0/private/AddOrder", payload).await;
+    let response: Result<Value, Error> = client
+        .send_private_json("/0/private/AddOrder", payload)
+        .await;
 
     match response {
         Ok(mut value) => {
             println!("Response: {}", value); // Debug print
-            // Add notional USD value to the response
+                                             // Add notional USD value to the response
             value["notional_usd_value"] = json!(notional_usd_value);
             // Add notional SOL value to the response
             value["notional_sol_value"] = json!(notional_sol_value);
             Ok(value)
-        },
+        }
         Err(e) => {
             match e {
                 Error::Api(api_err) => {
@@ -157,9 +163,10 @@ pub async fn execute_swap(pair: &str, side: OrderSide, volume: f64) -> Result<Va
                                 if let Some(errors) = json.get("error") {
                                     println!("Kraken API Error: {:?}", errors);
                                 } else {
-                                    println!("Error sending order: {:?}", api_err); // Fallback debug print
+                                    println!("Error sending order: {:?}", api_err);
+                                    // Fallback debug print
                                 }
-                            },
+                            }
                             Err(parse_err) => {
                                 println!("Failed to parse error JSON: {:?}", parse_err); // Debug print
                                 println!("Error sending order: {:?}", api_err); // Fallback debug print
@@ -169,7 +176,7 @@ pub async fn execute_swap(pair: &str, side: OrderSide, volume: f64) -> Result<Va
                         // Print non-JSON error string directly
                         println!("Kraken API Error: {}", api_err);
                     }
-                },
+                }
                 other_err => {
                     println!("Error sending order: {:?}", other_err); // Debug print
                 }
@@ -179,8 +186,36 @@ pub async fn execute_swap(pair: &str, side: OrderSide, volume: f64) -> Result<Va
     }
 }
 
-// Function to withdraw assets from Kraken
-pub async fn withdraw_assets(asset: &str, key: &str, address: &str, amount: f64) -> Result<Value, AppError> {
+// Function to create a new wallet for deposit using BTC Lightning in Kraken
+// pub async fn deposit_btc_lightning(asset: &str, amount: f64) -> Result<Value, AppError> {
+//     dotenv().ok(); // Load environment variables from the ".env" file
+
+//     // Read Kraken API key and secret stored in environment variables
+//     let api_key = std::env::var("KRAKEN_API_KEY")?;
+//     let api_secret = std::env::var("KRAKEN_API_SECRET")?;
+
+//     // Create the client
+//     let client = Client::new(api_key, api_secret);
+
+//     // Construct the request payload
+//     let payload = json!({
+//         "nonce": get_nonce(),
+//         "asset": asset, // Ticker in Kraken
+//         "method": "Bitcoin Lightning", // Method
+//         "new": true, // Always use a new wallet for deposit
+//         "amount": amount // Amount to deposit
+//     });
+
+//     // Send the request
+//     let response: Value = client
+//         .send_private_json("/0/private/DepositAddresses", payload)
+//         .await?;
+
+//     Ok(response)
+// }
+
+// Function to Get Kraken BTC deposit status
+pub async fn get_deposit_status(asset: &str, method: &str) -> Result<Value, AppError> {
     dotenv().ok(); // Load environment variables from the ".env" file
 
     // Read Kraken API key and secret stored in environment variables
@@ -193,7 +228,38 @@ pub async fn withdraw_assets(asset: &str, key: &str, address: &str, amount: f64)
     // Construct the request payload
     let payload = json!({
         "nonce": get_nonce(),
-        "asset": asset, // Name of Asset Ticker in Kraken
+        "asset": asset, // Asset Ticker in Kraken
+        "method": method, // Name of Method ie "Bitcoin Lightning"
+    });
+
+    // Send the request
+    let response: Value = client
+        .send_private_json("/0/private/DepositStatus", payload)
+        .await?;
+
+    Ok(response)
+}
+
+// Function to withdraw assets from Kraken
+pub async fn withdraw_assets(
+    asset: &str,
+    key: &str,
+    address: &str,
+    amount: f64,
+) -> Result<Value, AppError> {
+    dotenv().ok(); // Load environment variables from the ".env" file
+
+    // Read Kraken API key and secret stored in environment variables
+    let api_key = std::env::var("KRAKEN_API_KEY")?;
+    let api_secret = std::env::var("KRAKEN_API_SECRET")?;
+
+    // Create the client
+    let client = Client::new(api_key, api_secret);
+
+    // Construct the request payload
+    let payload = json!({
+        "nonce": get_nonce(),
+        "asset": asset, // Ticker in Kraken
         "key": key, // Name of Wallet in Kraken
         "address": address, // Address of Wallet in kraken
         "amount": amount // Amount to withdraw
@@ -272,7 +338,7 @@ pub async fn withdraw_assets(asset: &str, key: &str, address: &str, amount: f64)
 //     }
 
 //     let response_text = response.text().await?;
-    
+
 //     let response_json: ApiResponse = serde_json::from_str(&response_text)?;
 
 //     if let Some(price_str) = response_json.data.get(token_mint) {
@@ -300,4 +366,3 @@ pub async fn withdraw_assets(asset: &str, key: &str, address: &str, amount: f64)
 
 //     Ok(sol_to_spl_token_price)
 // }
-

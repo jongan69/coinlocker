@@ -16,7 +16,7 @@ RUN cargo chef cook --release --recipe-path recipe.json
 # Only re-copy source files if they change
 COPY . .
 RUN cargo build --release
-RUN mv ./target/release/combinedwallettest ./app
+RUN mv ./target/release/coinlockerapi ./app
 
 # Stage 4: Runtime - Use a minimal base image
 FROM debian:stable-slim AS runtime
@@ -25,6 +25,6 @@ WORKDIR /app
 # Install necessary libraries
 RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/app /usr/local/bin/combinedwallettest
-ENTRYPOINT ["/usr/local/bin/combinedwallettest"]
+COPY --from=builder /app/app /usr/local/bin/coinlockerapi
+ENTRYPOINT ["/usr/local/bin/coinlockerapi"]
 EXPOSE 8080

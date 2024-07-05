@@ -14,12 +14,14 @@ pub struct AppState {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Transaction {
-    pub txid: String,
+    pub user_id: i32,
     pub amount: f64,
-    pub user_id: i64,
-    pub status: String, // New field for transaction status
     pub processed: bool,
+    pub status: String, // New field for transaction status
+    pub address: String,
     pub timestamp: BsonDateTime,
+    // pub kraken_result: serde_json::Value,
+    // pub kraken_error: serde_json::Value,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -27,13 +29,13 @@ pub struct User {
     #[serde(rename = "_id")]
     pub id: ObjectId,
     pub user_id: i64,
-    pub username: String,
-    pub first_name: String,
+    pub username: Option<String>,
+    pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub api_key: Option<String>,
-    pub btc_address: String,
     pub total_deposit: f64,
     pub lockin_total: f64,
+    pub autobuy_amount: Option<f64>,
     pub solana_public_key: Option<String>,
     pub solana_private_key: Option<String>,
     pub bitcoin_public_key: Option<String>,
