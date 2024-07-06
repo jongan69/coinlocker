@@ -8,7 +8,7 @@ use serde_json::{json, Value};
 use std::{
     collections::HashMap,
     time::{SystemTime, UNIX_EPOCH},
-}; // Use reqwest client
+}; 
 
 // Structs
 #[derive(Debug, Deserialize, Serialize)]

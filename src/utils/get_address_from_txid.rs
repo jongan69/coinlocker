@@ -11,7 +11,7 @@ use std::str::FromStr;
 
 use crate::error_handling::AppError;
 
-// Function for getting the senders address using the 
+// Function for getting the senders address from the tx id 
 pub fn get_sender_addresses(txid_str: &str, electrum_url: &str) -> Result<Vec<Address>, AppError> {
     let txid = Txid::from_str(txid_str).map_err(|_| AppError::BitcoinConsensusError(bdk::bitcoin::consensus::encode::Error::ParseFailed("Failed to parse Txid".into())))?;
     let client = ElectrumClient::new(electrum_url)?;
