@@ -25,6 +25,7 @@ pub struct RegisterRequest {
     user_id: i64,
 }
 
+
 // Function to encrypt data using AES-256-GCM
 fn encrypt(data: &str, key: &Key<Aes256Gcm>, nonce: &Nonce<U12>) -> Result<String, AppError> {
     let cipher = Aes256Gcm::new(key);
@@ -130,13 +131,14 @@ async fn generate_and_save_wallets(user: &mut User) -> Result<(SolWalletResponse
 
     // Generate Ethereum wallet and encrypt the private key
     let (secret_key, pub_key, pub_address) = generate_keypair();
-    user.ethereum_public_key = Some(pub_key.to_string());
-    user.ethereum_private_key = Some(encrypt(&secret_key.to_string(), key, nonce)?);
+    let secret_key_str = hex::encode(secret_key.secret_bytes());
 
+    user.ethereum_public_key = Some(pub_key.to_string());
+    user.ethereum_private_key = Some(encrypt(&secret_key_str, key, nonce)?);
     // Return generated wallets and API key
     Ok((solana_wallet, bitcoin_wallet, EthereumWallet {
-        public_key: pub_key.to_string(),
-        secret_key: secret_key.to_string(),
+        public_key: pub_key,
+        secret_key: secret_key,
         public_address: pub_address.to_string(),
     }, api_key))
 }
