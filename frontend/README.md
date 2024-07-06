@@ -7,9 +7,13 @@ This bot acts as the front end for the Rust API by interacting with endpoints in
 1. Create .env file with the following contents:
 
     MONGO_URI=YOUR_MONGO_URI
+
     TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+
     KRAKEN_API_KEY=YOUR_KRAKEN_API_KEY
+
     KRAKEN_API_SECRET=YOUR_KRAKEN_API_SECRET
+    
     RUST_BACKEND_URL=http://localhost:8080  # Replace with your Rust backend URL
 
 2. `pip install -r requirements.txt`
