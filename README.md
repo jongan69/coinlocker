@@ -1,6 +1,6 @@
 # Coinlocker Bot & API
 
-A Rust AXUM API that automates the transaction process from bitcoin to Solana SPL Tokens using MongoDB, Kraken API, Jupiter Swap API, and Solana.
+A Python Telegram Bot and Rust AXUM API that automates the transaction process from bitcoin to Solana SPL Tokens using Lightning Payments on Kraken API, Mongodb, Jupiter Swap API, and Solana Blockchain.
 
 ## Prerequisites
 
