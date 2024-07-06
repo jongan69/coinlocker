@@ -29,6 +29,7 @@ def run_flask():
 
 # Environment variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+# TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN_DEV")
 API_KEY_KRAKEN = os.getenv('KRAKEN_API_KEY')
 API_SEC_KRAKEN = os.getenv('KRAKEN_API_SECRET')
 RUST_BACKEND_URL = os.getenv("RUST_BACKEND_URL")
@@ -107,16 +108,19 @@ async def start(update: Update, context: CallbackContext):
 
 async def lockin(update: Update, context: CallbackContext, user):
     existing_user = users_collection.find_one({"user_id": user.id})
-    if not users_collection.find_one({"user_id": user.id}):
-        await update.callback_query.message.reply_text("You are not registered. Please register first using /start.")
+    if not user:
+        await update.message.reply_text("You are not registered. Please register first using /start.")
         return
-
     autobuy_amount = existing_user.get("autobuy_amount")
-    if autobuy_amount:
-        await create_deposit_address(update, context, user, autobuy_amount)
-    else:
-        await update.callback_query.message.reply_text("Please enter the amount of BTC you want to lock in (minimum 0.0001 BTC, maximum 1 BTC):")
+    
+    if autobuy_amount is None:
+        print('SHOULD ASK FOR AMOUNT')
+        await update.message.reply_text("Please enter the amount of BTC you want to lock in (minimum 0.0001 BTC, maximum 1 BTC):")
         context.user_data["handler"] = handle_btc_amount
+    else:
+        print(autobuy_amount)
+        await create_deposit_address(update, context, user, autobuy_amount)
+        
 
 async def create_deposit_address(update: Update, context: CallbackContext, user, amount: Decimal):
     try:
@@ -131,7 +135,7 @@ async def create_deposit_address(update: Update, context: CallbackContext, user,
 
         if 'error' in deposit_response and deposit_response['error']:
             logger.error(f"Kraken deposit address error: {deposit_response['error']}")
-            await update.callback_query.message.reply_text("Error generating deposit address. Please try again later.")
+            await update.message.reply_text("Error generating deposit address. Please try again later.")
             return
 
         kraken_deposit_address = deposit_response['result'][0]['address']
@@ -150,7 +154,7 @@ async def create_deposit_address(update: Update, context: CallbackContext, user,
             parse_mode="HTML")
     except Exception as e:
         logger.error(f"Error creating deposit address: {e}")
-        await update.callback_query.message.reply_text("An error occurred. Please try again later.")
+        await update.message.reply_text("An error occurred. Please try again later.")
 
 async def handle_btc_amount(update: Update, context: CallbackContext):
     user = get_user(update)
