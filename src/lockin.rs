@@ -61,14 +61,15 @@ pub struct LockinClient {
 impl LockinClient {
     pub async fn new() -> Result<Self> {
         dotenv().ok();
+        let rpc_url = std::env::var("RPC_URL").context("RPC URL not set")?;
         let base58privatekey = std::env::var("PRIVATE_KEY").context("PRIVATE_KEY not set")?;
         let private_key_bytes = bs58::decode(base58privatekey)
             .into_vec()
             .context("Invalid base58 string")?;
         let keypair = Keypair::from_bytes(&private_key_bytes).context("Invalid keypair bytes")?;
-        let rpc_url = "https://api.mainnet-beta.solana.com".to_string();
+        let rpc_url_string = rpc_url.to_string();
         let jupiter_swap_api_client = JupiterSwapApiClient::new("https://quote-api.jup.ag/v6".to_string());
-        let rpc_client = RpcClient::new(rpc_url.clone());
+        let rpc_client = RpcClient::new(rpc_url_string.clone());
 
         Ok(Self {
             client: Client::new(),
